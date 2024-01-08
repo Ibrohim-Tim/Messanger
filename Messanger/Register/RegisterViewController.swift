@@ -93,12 +93,37 @@ extension RegisterViewController {
             
             switch result {
             case .success(let email):
+                let user = User(username: username, email: email)
+                
+                ProfileUserDefaults.handleUser(user)
+                DatabaseManager.shared.saveUser(user)
+                self.uploadProfilePicture(user: user)
+                
                 self.dismiss(animated: true) {
                     NotificationCenter.default.post(name: Notifications.loginDidFinish, object: nil)
                 }
             case .failure(let error):
                 print(error)
                 // можно добавить алерт об ошибке (ок)
+            }
+        }
+    }
+    
+    private func uploadProfilePicture(user: User) {
+        guard let profilePicture = self.mainView.profilePicture,
+              let data = profilePicture.pngData()
+        else {
+            ProfileUserDefaults.handleAvatarData(nil)
+            return
+        }
+        
+        StorageManager.shared.upload(data: data, filename: user.pictureFilename) { result in
+            switch result {
+            case .success:
+                ProfileUserDefaults.handleAvatarData(data)
+            case .failure(let error):
+                ProfileUserDefaults.handleAvatarData(nil)
+                print(error)
             }
         }
     }
@@ -199,7 +224,7 @@ extension RegisterViewController: UIImagePickerControllerDelegate {
             return
         }
         
-        mainView.profileImageView.image = image
+        mainView.profilePicture = image
         
         picker.dismiss(animated: true)
     }

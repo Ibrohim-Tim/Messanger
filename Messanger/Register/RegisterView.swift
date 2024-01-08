@@ -9,6 +9,12 @@ import UIKit
 
 final class RegisterView: UIView {
     
+    var profilePicture: UIImage? {
+        didSet {
+            profileImageView.image = profilePicture
+        }
+    }
+    
     // MARK: - UI Elements
     
     private lazy var greetingLabel = BaseComponentsFactory.makeGreetingLabel(text: "Hello! Register to get started")

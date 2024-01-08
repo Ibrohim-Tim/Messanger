@@ -58,6 +58,26 @@ final class LoginViewController: UIViewController {
             
             switch result {
             case .success(let email):
+                DatabaseManager.shared.getUser(email: email) { result in
+                    switch result {
+                    case .success(let user):
+                        ProfileUserDefaults.handleUser(user)
+                        
+                        StorageManager.shared.url(for: user.pictureFilename) { result in
+                            switch result {
+                            case .success(let url):
+                                ProfileUserDefaults.handleAvatarUrl(url)
+                            case .failure(let error):
+                                ProfileUserDefaults.handleAvatarUrl(nil)
+                                print(error)
+                            }
+                        }
+                        
+                    case .failure(let error):
+                        print(error)
+                    }
+                }
+                
                 NotificationCenter.default.post(name: Notifications.loginDidFinish, object: nil)
                 self.dismiss(animated: true)
             case .failure(let error):

@@ -21,6 +21,18 @@ final class ChatsListTableViewCell: UITableViewCell {
         return imageView
     }()
     
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let subtitleLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     // MARK: - Init
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -37,6 +49,8 @@ final class ChatsListTableViewCell: UITableViewCell {
     
     private func setupLayout() {
         setupChatImageViewLayout()
+        setupTitleLabelLayout()
+        setupSubtitleLabelLayout()
     }
     
     private func setupChatImageViewLayout() {
@@ -48,7 +62,24 @@ final class ChatsListTableViewCell: UITableViewCell {
         chatImageView.heightAnchor.constraint(equalToConstant: LayoutMetrics.module * 5).isActive = true
     }
     
-    func configure() {
+    private func setupTitleLabelLayout() {
+        contentView.addSubview(titleLabel)
         
+        titleLabel.topAnchor.constraint(equalTo: chatImageView.topAnchor, constant: LayoutMetrics.halfModule).activate()
+        titleLabel.leadingAnchor.constraint(equalTo: chatImageView.trailingAnchor, constant: LayoutMetrics.module).activate()
+        titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -LayoutMetrics.doubleModule).activate()
+    }
+    
+    private func setupSubtitleLabelLayout() {
+        contentView.addSubview(subtitleLabel)
+        
+        subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).activate()
+        subtitleLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor).activate()
+        subtitleLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor).activate()
+    }
+    
+    func configure(username: String, message: String) {
+        titleLabel.text = username
+        subtitleLabel.text = message
     }
 }

@@ -10,7 +10,7 @@ import UIKit
 final class ChatsListViewController: UIViewController {
     
     private var chats: [ChatItem] = []
-    
+        
     // MARK: - UI Elements
     
     private let tabelView: UITableView = {
@@ -29,8 +29,15 @@ final class ChatsListViewController: UIViewController {
         
         title = "Чаты"
         
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .compose,
+            target: self,
+            action: #selector(newChatButtonTapped)
+        )
+        
         setupSearchController()
         setupTabelView()
+        listenConversations()
     }
     
     // MARK: - Private methods
@@ -51,6 +58,20 @@ final class ChatsListViewController: UIViewController {
         setupTabelViewLayout()
     }
     
+    private func listenConversations() {
+        guard let currentUserEmail = ProfileUserDefaults.email?.safe else { return }
+        
+        DatabaseManager.shared.getAllConversations(for: currentUserEmail) { [weak self] result in
+            switch result {
+            case .success(let conversations):
+                self?.chats = conversations
+                self?.tabelView.reloadData()
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
     private func setupTabelViewLayout() {
         view.addSubview(tabelView)
         
@@ -59,14 +80,28 @@ final class ChatsListViewController: UIViewController {
         tabelView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         tabelView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
+    
+    @objc
+    private func newChatButtonTapped() {
+        let vc = NewConversationViewController()
+        vc.completion = { [weak self] username, email in
+            self?.showChatViewController(username: username, email: email, isNewConversation: true)
+        }
+        present(vc, animated: true)
+    }
+    
+    private func showChatViewController(username: String, email: String, isNewConversation: Bool) {
+        let viewController = ChatViewController(otherUserEmail: email, isNewConversation: isNewConversation)
+        viewController.title = username
+        navigationController?.pushViewController(viewController, animated: true)
+    }
 }
 
 // MARK: - UITableViewDataSource
 
 extension ChatsListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        1
-//        chats.count
+        chats.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -74,7 +109,9 @@ extension ChatsListViewController: UITableViewDataSource {
             fatalError("Can not dequeue ChatsListTableViewCell")
         }
         
-        cell.configure()
+        let conversation = chats[indexPath.row]
+        
+        cell.configure(username: conversation.username, message: conversation.lastMessage)
         cell.selectionStyle = .none
         
         return cell
@@ -85,7 +122,6 @@ extension ChatsListViewController: UITableViewDataSource {
 
 extension ChatsListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let viewController = ChatViewController()
-        navigationController?.pushViewController(viewController, animated: true)
+        showChatViewController(username: "", email: "", isNewConversation: false)
     }
 }

@@ -11,7 +11,7 @@ import FirebaseAuth
 final class RegisterNetworkService {
     
     enum RegistrationError: Error {
-        case error(String)
+        case error(Error?)
     }
     
     func register(email: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
@@ -19,7 +19,7 @@ final class RegisterNetworkService {
             guard let result = result, let email = result.user.email, error == nil else {
                 completion(
                     .failure(
-                        RegistrationError.error("User creation error")
+                        RegistrationError.error(error)
                     )
                 )
                 return
