@@ -18,6 +18,7 @@ final class NewConversationTableViewCell: UITableViewCell {
          imageView.translatesAutoresizingMaskIntoConstraints = false
          imageView.clipsToBounds = true
          imageView.layer.cornerRadius = LayoutMetrics.halfModule * 5
+         imageView.image = UIImage(named: "person_placeholder")
          return imageView
      }()
      
@@ -77,10 +78,20 @@ final class NewConversationTableViewCell: UITableViewCell {
          subtitleLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor).activate()
          subtitleLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor).activate()
      }
-     
+    
+    private func configureAvatarImage(email: String) {
+        UserAvatarProvider.shared.avatar(for: email) { [weak self] data in
+            guard let data = data else { return }
+            
+            DispatchQueue.main.async {
+                self?.chatImageView.image = UIImage(data: data)
+            }
+        }
+    }
+
      func configure(user: ChatUser) {
-         chatImageView.image = user.picture
-         titleLabel.text = user.email
-         subtitleLabel.text = user.username
+         titleLabel.text = user.username
+         
+         configureAvatarImage(email: user.email)
      }
 }

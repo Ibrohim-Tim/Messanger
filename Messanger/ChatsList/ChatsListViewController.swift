@@ -85,13 +85,20 @@ final class ChatsListViewController: UIViewController {
     private func newChatButtonTapped() {
         let vc = NewConversationViewController()
         vc.completion = { [weak self] username, email in
-            self?.showChatViewController(username: username, email: email, isNewConversation: true)
+            self?.showChatViewController(conversationId: nil, username: username, email: email)
         }
         present(vc, animated: true)
     }
     
-    private func showChatViewController(username: String, email: String, isNewConversation: Bool) {
-        let viewController = ChatViewController(otherUserEmail: email, isNewConversation: isNewConversation)
+    private func showChatViewController(
+        conversationId: String?,
+        username: String,
+        email: String
+    ) {
+        let viewController = ChatViewController(
+            conversationId: conversationId,
+            otherUserEmail: email
+        )
         viewController.title = username
         navigationController?.pushViewController(viewController, animated: true)
     }
@@ -105,13 +112,20 @@ extension ChatsListViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tabelView.dequeueReusableCell(withIdentifier: ChatsListTableViewCell.reuseId, for: indexPath) as? ChatsListTableViewCell else {
+        guard let cell = tabelView.dequeueReusableCell(
+            withIdentifier: ChatsListTableViewCell.reuseId,
+            for: indexPath
+        ) as? ChatsListTableViewCell else {
             fatalError("Can not dequeue ChatsListTableViewCell")
         }
         
         let conversation = chats[indexPath.row]
         
-        cell.configure(username: conversation.username, message: conversation.lastMessage)
+        cell.configure(
+            email: conversation.email,
+            username: conversation.username,
+            message: conversation.lastMessage
+        )
         cell.selectionStyle = .none
         
         return cell
@@ -122,6 +136,11 @@ extension ChatsListViewController: UITableViewDataSource {
 
 extension ChatsListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        showChatViewController(username: "", email: "", isNewConversation: false)
+        let item = chats[indexPath.row]
+        showChatViewController(
+            conversationId: item.id,
+            username: item.username,
+            email: item.email
+        )
     }
 }

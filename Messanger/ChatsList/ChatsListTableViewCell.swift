@@ -18,6 +18,7 @@ final class ChatsListTableViewCell: UITableViewCell {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = LayoutMetrics.halfModule * 5
+        imageView.image = UIImage(named: "person_placeholder")
         return imageView
     }()
     
@@ -78,8 +79,19 @@ final class ChatsListTableViewCell: UITableViewCell {
         subtitleLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor).activate()
     }
     
-    func configure(username: String, message: String) {
+    private func configureAvatarImage(email: String) {
+        UserAvatarProvider.shared.avatar(for: email) { [weak self] data in
+            guard let data = data else { return }
+            
+            DispatchQueue.main.async {
+                self?.chatImageView.image = UIImage(data: data)
+            }
+        }
+    }
+    
+    func configure(email: String, username: String, message: String) {
         titleLabel.text = username
         subtitleLabel.text = message
+        configureAvatarImage(email: email)
     }
 }

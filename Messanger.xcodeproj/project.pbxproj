@@ -7,6 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CF2C6C162B1F348C0025EF10 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C152B1F348C0025EF10 /* DatabaseManager.swift */; };
+		CF2C6C192B1F37080025EF10 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C182B1F37080025EF10 /* User.swift */; };
+		CF2C6C1B2B1F53780025EF10 /* String+Safe.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C1A2B1F53780025EF10 /* String+Safe.swift */; };
+		CF2C6C1D2B1F541A0025EF10 /* NSLayoutConstraint+Activate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C1C2B1F541A0025EF10 /* NSLayoutConstraint+Activate.swift */; };
+		CF2C6C222B1F693E0025EF10 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C212B1F693E0025EF10 /* StorageManager.swift */; };
+		CF2C6C272B289EEC0025EF10 /* NewConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C262B289EEC0025EF10 /* NewConversationViewController.swift */; };
+		CF2C6C292B28A9780025EF10 /* ChatUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C282B28A9780025EF10 /* ChatUser.swift */; };
+		CF2C6C2B2B29CA9D0025EF10 /* NewConversationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C2A2B29CA9D0025EF10 /* NewConversationTableViewCell.swift */; };
+		CF2C6C2E2B2EDBC30025EF10 /* MessageKit in Frameworks */ = {isa = PBXBuildFile; productRef = CF2C6C2D2B2EDBC30025EF10 /* MessageKit */; };
+		CF2C6C302B2EE9070025EF10 /* ProfileUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C2F2B2EE9070025EF10 /* ProfileUserDefaults.swift */; };
+		CF2C6C322B3DBE0C0025EF10 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C312B3DBE0C0025EF10 /* Message.swift */; };
+		CF2C6C342B3DC0080025EF10 /* Sender.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C332B3DC0080025EF10 /* Sender.swift */; };
+		CF2C6C382B4458280025EF10 /* MessageKind+Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C372B4458280025EF10 /* MessageKind+Text.swift */; };
+		CF6FDF442B4FF84500188240 /* UserAvatarProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF6FDF432B4FF84500188240 /* UserAvatarProvider.swift */; };
 		CFD03BF82B15D51E008E7E0A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD03BF72B15D51E008E7E0A /* AppDelegate.swift */; };
 		CFD03BFA2B15D51E008E7E0A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD03BF92B15D51E008E7E0A /* SceneDelegate.swift */; };
 		CFD03C012B15D520008E7E0A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CFD03C002B15D520008E7E0A /* Assets.xcassets */; };
@@ -38,6 +52,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CF2C6C152B1F348C0025EF10 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
+		CF2C6C182B1F37080025EF10 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		CF2C6C1A2B1F53780025EF10 /* String+Safe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Safe.swift"; sourceTree = "<group>"; };
+		CF2C6C1C2B1F541A0025EF10 /* NSLayoutConstraint+Activate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSLayoutConstraint+Activate.swift"; sourceTree = "<group>"; };
+		CF2C6C212B1F693E0025EF10 /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
+		CF2C6C262B289EEC0025EF10 /* NewConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationViewController.swift; sourceTree = "<group>"; };
+		CF2C6C282B28A9780025EF10 /* ChatUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatUser.swift; sourceTree = "<group>"; };
+		CF2C6C2A2B29CA9D0025EF10 /* NewConversationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationTableViewCell.swift; sourceTree = "<group>"; };
+		CF2C6C2F2B2EE9070025EF10 /* ProfileUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileUserDefaults.swift; sourceTree = "<group>"; };
+		CF2C6C312B3DBE0C0025EF10 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		CF2C6C332B3DC0080025EF10 /* Sender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sender.swift; sourceTree = "<group>"; };
+		CF2C6C372B4458280025EF10 /* MessageKind+Text.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MessageKind+Text.swift"; sourceTree = "<group>"; };
+		CF6FDF432B4FF84500188240 /* UserAvatarProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAvatarProvider.swift; sourceTree = "<group>"; };
 		CFD03BF42B15D51E008E7E0A /* Messanger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messanger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFD03BF72B15D51E008E7E0A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CFD03BF92B15D51E008E7E0A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -75,12 +102,43 @@
 				CFD03C352B18A19F008E7E0A /* FirebaseStorage in Frameworks */,
 				CFD03C2B2B18A19F008E7E0A /* FirebaseAuth in Frameworks */,
 				CFD03C332B18A19F008E7E0A /* FirebaseFirestoreSwift in Frameworks */,
+				CF2C6C2E2B2EDBC30025EF10 /* MessageKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CF2C6C172B1F36F70025EF10 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				CF2C6C182B1F37080025EF10 /* User.swift */,
+				CF2C6C282B28A9780025EF10 /* ChatUser.swift */,
+				CF2C6C312B3DBE0C0025EF10 /* Message.swift */,
+				CF2C6C332B3DC0080025EF10 /* Sender.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		CF2C6C202B1F544B0025EF10 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				CF2C6C1A2B1F53780025EF10 /* String+Safe.swift */,
+				CF2C6C1C2B1F541A0025EF10 /* NSLayoutConstraint+Activate.swift */,
+				CF2C6C372B4458280025EF10 /* MessageKind+Text.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		CF2C6C252B289E990025EF10 /* NewConversation */ = {
+			isa = PBXGroup;
+			children = (
+				CF2C6C262B289EEC0025EF10 /* NewConversationViewController.swift */,
+				CF2C6C2A2B29CA9D0025EF10 /* NewConversationTableViewCell.swift */,
+			);
+			path = NewConversation;
+			sourceTree = "<group>";
+		};
 		CFD03BEB2B15D51E008E7E0A = {
 			isa = PBXGroup;
 			children = (
@@ -100,6 +158,8 @@
 		CFD03BF62B15D51E008E7E0A /* Messanger */ = {
 			isa = PBXGroup;
 			children = (
+				CF2C6C252B289E990025EF10 /* NewConversation */,
+				CF2C6C172B1F36F70025EF10 /* Models */,
 				CFD03C3A2B1BD0AD008E7E0A /* Chat */,
 				CFD03C1C2B15FC4E008E7E0A /* Register */,
 				CFD03C132B15DFCC008E7E0A /* Login */,
@@ -108,14 +168,19 @@
 				CFD03BF72B15D51E008E7E0A /* AppDelegate.swift */,
 				CFD03BF92B15D51E008E7E0A /* SceneDelegate.swift */,
 				CFD03C112B15DC9A008E7E0A /* MainTabBarController.swift */,
-				CFD03C182B15E75D008E7E0A /* LayoutMetrics.swift */,
-				CFD03C1A2B15EA58008E7E0A /* Colors.swift */,
 				CFD03C212B16033A008E7E0A /* BaseComponentsFactory.swift */,
+				CF2C6C152B1F348C0025EF10 /* DatabaseManager.swift */,
+				CF2C6C212B1F693E0025EF10 /* StorageManager.swift */,
+				CFD03C182B15E75D008E7E0A /* LayoutMetrics.swift */,
 				CFD03C232B188923008E7E0A /* Notification.swift */,
+				CFD03C1A2B15EA58008E7E0A /* Colors.swift */,
+				CF2C6C202B1F544B0025EF10 /* Extensions */,
 				CFD03C002B15D520008E7E0A /* Assets.xcassets */,
 				CFD03C022B15D520008E7E0A /* LaunchScreen.storyboard */,
 				CFD03C252B189504008E7E0A /* GoogleService-Info.plist */,
 				CFD03C052B15D520008E7E0A /* Info.plist */,
+				CF2C6C2F2B2EE9070025EF10 /* ProfileUserDefaults.swift */,
+				CF6FDF432B4FF84500188240 /* UserAvatarProvider.swift */,
 			);
 			path = Messanger;
 			sourceTree = "<group>";
@@ -190,6 +255,7 @@
 				CFD03C302B18A19F008E7E0A /* FirebaseFirestore */,
 				CFD03C322B18A19F008E7E0A /* FirebaseFirestoreSwift */,
 				CFD03C342B18A19F008E7E0A /* FirebaseStorage */,
+				CF2C6C2D2B2EDBC30025EF10 /* MessageKit */,
 			);
 			productName = Messanger;
 			productReference = CFD03BF42B15D51E008E7E0A /* Messanger.app */;
@@ -221,6 +287,7 @@
 			mainGroup = CFD03BEB2B15D51E008E7E0A;
 			packageReferences = (
 				CFD03C272B18A19E008E7E0A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				CF2C6C2C2B2EDBC30025EF10 /* XCRemoteSwiftPackageReference "MessageKit" */,
 			);
 			productRefGroup = CFD03BF52B15D51E008E7E0A /* Products */;
 			projectDirPath = "";
@@ -251,22 +318,35 @@
 			files = (
 				CFD03C202B160290008E7E0A /* RegisterView.swift in Sources */,
 				CFD03C152B15DFED008E7E0A /* LoginViewController.swift in Sources */,
+				CF2C6C1D2B1F541A0025EF10 /* NSLayoutConstraint+Activate.swift in Sources */,
+				CF6FDF442B4FF84500188240 /* UserAvatarProvider.swift in Sources */,
 				CFD03C3C2B1BD0E8008E7E0A /* ChatViewController.swift in Sources */,
+				CF2C6C382B4458280025EF10 /* MessageKind+Text.swift in Sources */,
+				CF2C6C292B28A9780025EF10 /* ChatUser.swift in Sources */,
 				CFD03C1E2B15FC78008E7E0A /* RegisterViewController.swift in Sources */,
 				CFD03C1B2B15EA58008E7E0A /* Colors.swift in Sources */,
+				CF2C6C1B2B1F53780025EF10 /* String+Safe.swift in Sources */,
 				CFD03C172B15E2F7008E7E0A /* LoginView.swift in Sources */,
 				CFD03C392B19009D008E7E0A /* LoginNetworkService.swift in Sources */,
 				CFD03C3E2B1BD29A008E7E0A /* ChatsListTableViewCell.swift in Sources */,
+				CF2C6C192B1F37080025EF10 /* User.swift in Sources */,
 				CFD03C402B1BD493008E7E0A /* ChatItem.swift in Sources */,
+				CF2C6C322B3DBE0C0025EF10 /* Message.swift in Sources */,
+				CF2C6C342B3DC0080025EF10 /* Sender.swift in Sources */,
 				CFD03BF82B15D51E008E7E0A /* AppDelegate.swift in Sources */,
 				CFD03C192B15E75D008E7E0A /* LayoutMetrics.swift in Sources */,
 				CFD03C242B188923008E7E0A /* Notification.swift in Sources */,
 				CFD03C222B16033A008E7E0A /* BaseComponentsFactory.swift in Sources */,
 				CFD03C372B18C368008E7E0A /* RegisterNetworkService.swift in Sources */,
+				CF2C6C162B1F348C0025EF10 /* DatabaseManager.swift in Sources */,
+				CF2C6C2B2B29CA9D0025EF10 /* NewConversationTableViewCell.swift in Sources */,
+				CF2C6C302B2EE9070025EF10 /* ProfileUserDefaults.swift in Sources */,
+				CF2C6C272B289EEC0025EF10 /* NewConversationViewController.swift in Sources */,
 				CFD03C0D2B15D8DB008E7E0A /* ChatsListViewController.swift in Sources */,
 				CFD03C122B15DC9A008E7E0A /* MainTabBarController.swift in Sources */,
 				CFD03C102B15DC2E008E7E0A /* ProfileViewController.swift in Sources */,
 				CFD03BFA2B15D51E008E7E0A /* SceneDelegate.swift in Sources */,
+				CF2C6C222B1F693E0025EF10 /* StorageManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -482,6 +562,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		CF2C6C2C2B2EDBC30025EF10 /* XCRemoteSwiftPackageReference "MessageKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MessageKit/MessageKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
 		CFD03C272B18A19E008E7E0A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -493,6 +581,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		CF2C6C2D2B2EDBC30025EF10 /* MessageKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CF2C6C2C2B2EDBC30025EF10 /* XCRemoteSwiftPackageReference "MessageKit" */;
+			productName = MessageKit;
+		};
 		CFD03C282B18A19F008E7E0A /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = CFD03C272B18A19E008E7E0A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

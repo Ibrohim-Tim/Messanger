@@ -10,5 +10,4 @@ import UIKit
 struct ChatUser {
     let email: String
     let username: String
-    let picture: UIImage?
 }

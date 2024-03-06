@@ -15,6 +15,7 @@ final class DatabaseManager {
     private let database = FirebaseDatabase.Database.database().reference()
     
     private init() {}
+//    let a = FirebaseDatabase.Database.database().reference()
 }
 
 // MARK: - Accaunt manager
@@ -25,12 +26,13 @@ extension DatabaseManager {
         case error
         case allUsers
         case userConversations
+        case conversationMessages
     }
     
     func saveUser(_ user: User) {
 
         let userData = [
-            "username": user.username.safe
+            "username": user.username
         ]
         
         database.child(user.email.safe).setValue(userData) { [weak self] error, reference in
@@ -40,8 +42,8 @@ extension DatabaseManager {
             
             self?.database.child("users").observeSingleEvent(of: .value) { snapshot in
                 let user = [
-                    "email": user.email.safe,
-                    "username": user.username.safe
+                    "email": user.email,
+                    "username": user.username
                 ]
                 
                 if var users = snapshot.value as? [[String: String]] {
@@ -59,8 +61,8 @@ extension DatabaseManager {
     func getUser(email: String, completion: @escaping (Result<User, Error>) -> Void) {
         
         database.child(email.safe).observeSingleEvent(of: .value) { snapshot in
-            guard let data = snapshot.value as? [String: String],
-                  let username = data["username"]
+            guard let data = snapshot.value as? [String: Any],
+                  let username = data["username"] as? String
             else {
                 completion(
                     .failure(DatabaseManagerError.error)
@@ -79,11 +81,15 @@ extension DatabaseManager {
     func getAllUsers(completion: @escaping (Result<[[String: String]], Error>) -> Void) {
         database.child("users").observeSingleEvent(of: .value) { snapshot in
             guard let users = snapshot.value as? [[String: String]] else {
-                completion(.failure(DatabaseManagerError.allUsers))
+                completion(
+                    .failure(DatabaseManagerError.allUsers)
+                )
                 return
             }
             
-            completion(.success(users))
+            completion(
+                .success(users)
+            )
         }
     }
 }
@@ -99,7 +105,7 @@ extension DatabaseManager {
         message: Message,
         completion: @escaping (Bool) -> Void
     ) {
-        guard let currentUserEmail = ProfileUserDefaults.email?.safe,
+        guard let currentUserEmail = ProfileUserDefaults.email,
               let currentUsername = ProfileUserDefaults.username,
               let otherUsername = otherUsername
         else {
@@ -113,18 +119,23 @@ extension DatabaseManager {
             conversationId: conversationId,
             date: dateString,
             username: otherUsername,
-            currentUserEmail: currentUserEmail,
+            currentUserEmail: currentUserEmail.safe,
             otherUserEmail: otherUserEmail,
-            message: message) { isSuccess in }
+            message: message
+        ) { isSuccess in
+            
+        }
         
         updateConversationForOtherUser(
             conversationId: conversationId,
-            currentUserEmail: dateString,
+            currentUserEmail: currentUserEmail,
             username: currentUsername,
-            otherUserEmail: currentUserEmail,
-            date: otherUserEmail,
-            message: message) { isSuccess in }
-       
+            otherUserEmail: otherUserEmail.safe,
+            date: dateString,
+            message: message
+        ) { isSuccess in
+            
+        }
     }
     
     private func updateConversationForCurrentUser(
@@ -145,7 +156,7 @@ extension DatabaseManager {
                 "date": date,
                 "message": message.kind.messageText,
                 "is_read": false
-            ] // as [String : Any] //просит добавить это но у абдуллы такого нет если что удалить
+            ] as [String : Any]
         ]
         
         let reference = database.child(currentUserEmail)
@@ -155,7 +166,7 @@ extension DatabaseManager {
                 completion(false)
                 return
             }
-                
+            
             if var conversations = user["conversations"] as? [[String: Any]] {
                 // массив есть
                 conversations.append(conversation)
@@ -198,7 +209,7 @@ extension DatabaseManager {
                 "date": date,
                 "message": message.kind.messageText,
                 "is_read": false
-            ] // as [String : Any] //просит добавить это но у абдуллы такого нет если что удалить
+            ] as [String : Any]
         ]
         
         let reference = database.child(otherUserEmail)
@@ -241,7 +252,7 @@ extension DatabaseManager {
         ]
         
         let conversation = [
-            "messages": message
+            "messages": [message]
         ]
         
         let reference = database.child(conversationId)
@@ -269,12 +280,14 @@ extension DatabaseManager {
             let resultConversations: [ChatItem] = conversations.compactMap { conversation in
                 guard let lastMessage = conversation["latest_message"] as? [String: Any],
                       let text = lastMessage["message"] as? String,
-                      let email = conversation["other_user_email"] as? String
+                      let username = conversation["username"] as? String,
+                      let email = conversation["other_user_email"] as? String,
+                      let id = conversation["conversation_id"] as? String
                 else {
                     return nil
                 }
                 
-                return ChatItem(image: nil, username: email, lastMessage: text)
+                return ChatItem(id: id, email: email, username: username, lastMessage: text)
             }
             
             completion(
@@ -282,5 +295,45 @@ extension DatabaseManager {
             )
         }
     }
+    
+    /// Get all messages from conversation
+    func getAllMessagesForConversation(
+        conversationId: String,
+        completion: @escaping (Result<[Message], Error>) -> Void
+    ) {
+        let reference = database.child("\(conversationId)/messages")
+        
+        reference.observe(.value) { snapshot in
+            guard let messages = snapshot.value as? [[String: Any]] else {
+                completion(
+                    .failure(DatabaseManagerError.conversationMessages)
+                )
+                return
+            }
+            
+            let messsageItems: [Message] = messages.compactMap { message in
+                guard let text = message["message"] as? String,
+                      let senderEmail = message["sender_email"] as? String,
+                      let messageId = message["id"] as? String,
+                      let dateString = message["date"] as? String,
+                      let date = ChatViewController.formatter.date(from: dateString)
+                else {
+                    return nil
+                }
+                
+                let sender = Sender(senderId: senderEmail, displayName: senderEmail)
+                
+                return Message(
+                    sender: sender,
+                    messageId: messageId,
+                    sentDate: date,
+                    kind: .text(text)
+                )
+            }
+            
+            completion(
+                .success(messsageItems)
+            )
+        }
+    }
 }
-

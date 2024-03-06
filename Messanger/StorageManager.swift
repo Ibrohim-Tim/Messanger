@@ -9,6 +9,7 @@ import Foundation
 import FirebaseStorage
 
 struct StorageManager {
+    
     static let shared = StorageManager()
     
     private let storage = FirebaseStorage.Storage.storage().reference()
@@ -26,7 +27,7 @@ extension StorageManager {
     }
     
     func upload(data: Data, filename: String, completion: @escaping (Result<String, Error>) -> Void) {
-        storage.child("images/\(filename).png").putData(data) { data, error in
+        storage.child("images/\(filename)").putData(data) { data, error in
             guard let _ = data, error == nil else {
                 completion(
                     .failure(StorageManagerError.uploadPictureError)
@@ -46,7 +47,9 @@ extension StorageManager {
                 return
             }
             
-            completion(.success(url))
+            completion(
+                .success(url)
+            )
         }
     }
 }

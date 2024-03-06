@@ -22,19 +22,25 @@ final class ChatViewController: MessagesViewController {
     private var messages: [Message] = []
     
     private var sender: Sender? {
-        guard let username = ProfileUserDefaults.username else { return nil }
+        guard let email = ProfileUserDefaults.email,
+                let username = ProfileUserDefaults.username
+        else {
+            return nil
+        }
         
-        return Sender(senderId: "", displayName: username)
+        return Sender(senderId: email.safe, displayName: username)
     }
     
     private let otherUserEmail: String
     private var isNewConversation: Bool
+    private let conversationId: String?
 
     //MARK: - Init
     
-    init(otherUserEmail: String, isNewConversation: Bool) {
+    init(conversationId: String?, otherUserEmail: String) {
         self.otherUserEmail = otherUserEmail
-        self.isNewConversation = isNewConversation
+        self.isNewConversation = conversationId == nil
+        self.conversationId = conversationId
         
         super.init(nibName: nil, bundle: nil)
         
@@ -57,6 +63,23 @@ final class ChatViewController: MessagesViewController {
         messageInputBar.delegate = self
         
         view.backgroundColor = .white
+        
+        listenMessagesInConversation()
+    }
+    
+    private func listenMessagesInConversation() {
+        guard let conversationId = conversationId else { return }
+        
+        DatabaseManager.shared.getAllMessagesForConversation(conversationId: conversationId) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let messages):
+                self.messages = messages
+                self.messagesCollectionView.reloadData()
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
 }
 
@@ -87,7 +110,7 @@ private extension ChatViewController {
         let date = Date()
         let dateString = Self.formatter.string(from: date)
         
-        let id = "\(currentUserEmail)_\(otherUserEmail)_\(date)"
+        let id = "\(currentUserEmail)_\(otherUserEmail.safe)_\(date)"
         
         return id
     }

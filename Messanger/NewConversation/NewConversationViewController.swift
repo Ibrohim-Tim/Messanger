@@ -100,7 +100,12 @@ class NewConversationViewController: UIViewController {
                 continue
             }
             
-            result.append(ChatUser(email: email, username: username, picture: nil))
+            result.append(
+                ChatUser(
+                    email: email,
+                    username: username
+                )
+            )
         }
         
         return result
@@ -159,9 +164,9 @@ extension NewConversationViewController: UISearchBarDelegate {
     
     private func displayUsers(users: [ChatUser], searchText: String) {
         items = users.filter {
-            $0.email.lowercased().hasPrefix(searchText.lowercased())
+            $0.username.lowercased().hasPrefix(searchText.lowercased())
         }
-        
+       
         tableView.reloadData()
     }
 }

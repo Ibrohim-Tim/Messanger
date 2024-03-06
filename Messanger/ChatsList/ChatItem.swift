@@ -8,7 +8,8 @@
 import UIKit
 
 struct ChatItem {
-    let image: UIImage?
+    let id: String
+    let email: String
     let username: String
     let lastMessage: String
 }

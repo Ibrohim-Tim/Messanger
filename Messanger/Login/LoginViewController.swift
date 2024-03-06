@@ -73,13 +73,14 @@ final class LoginViewController: UIViewController {
                             }
                         }
                         
+                        NotificationCenter.default.post(name: Notifications.loginDidFinish, object: nil)
+                        self.dismiss(animated: true)
+                        
                     case .failure(let error):
                         print(error)
                     }
                 }
                 
-                NotificationCenter.default.post(name: Notifications.loginDidFinish, object: nil)
-                self.dismiss(animated: true)
             case .failure(let error):
                 print(error)  // можно показать алерт вместо принта
             }
