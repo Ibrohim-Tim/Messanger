@@ -34,6 +34,14 @@ final class ChatsListTableViewCell: UITableViewCell {
         return label
     }()
     
+    private let newMessageSignView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .systemBlue
+        view.layer.cornerRadius = LayoutMetrics.halfModule * 2.5
+        return view
+    }()
+    
     // MARK: - Init
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -52,6 +60,7 @@ final class ChatsListTableViewCell: UITableViewCell {
         setupChatImageViewLayout()
         setupTitleLabelLayout()
         setupSubtitleLabelLayout()
+        setupNewMessageSignViewLayout()
     }
     
     private func setupChatImageViewLayout() {
@@ -79,6 +88,15 @@ final class ChatsListTableViewCell: UITableViewCell {
         subtitleLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor).activate()
     }
     
+    private func setupNewMessageSignViewLayout() {
+        contentView.addSubview(newMessageSignView)
+        
+        newMessageSignView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).activate()
+        newMessageSignView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -LayoutMetrics.doubleModule).activate()
+        newMessageSignView.heightAnchor.constraint(equalToConstant: LayoutMetrics.halfModule * 5).activate()
+        newMessageSignView.widthAnchor.constraint(equalToConstant: LayoutMetrics.halfModule * 5).activate()
+    }
+    
     private func configureAvatarImage(email: String) {
         UserAvatarProvider.shared.avatar(for: email) { [weak self] data in
             guard let data = data else { return }
@@ -89,9 +107,10 @@ final class ChatsListTableViewCell: UITableViewCell {
         }
     }
     
-    func configure(email: String, username: String, message: String) {
+    func configure(email: String, username: String, message: String, isRead: Bool) {
         titleLabel.text = username
         subtitleLabel.text = message
+        newMessageSignView.isHidden = isRead
         configureAvatarImage(email: email)
     }
 }

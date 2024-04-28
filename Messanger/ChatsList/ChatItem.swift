@@ -8,8 +8,14 @@
 import UIKit
 
 struct ChatItem {
+    
+    struct LastMessage {
+        let message: String
+        let isRead: Bool
+    }
+    
     let id: String
     let email: String
     let username: String
-    let lastMessage: String
+    let lastMessage: LastMessage
 }

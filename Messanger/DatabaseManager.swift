@@ -278,16 +278,19 @@ extension DatabaseManager {
             }
             
             let resultConversations: [ChatItem] = conversations.compactMap { conversation in
-                guard let lastMessage = conversation["latest_message"] as? [String: Any],
-                      let text = lastMessage["message"] as? String,
+                guard let lastMessageResult = conversation["latest_message"] as? [String: Any],
+                      let text = lastMessageResult["message"] as? String,
                       let username = conversation["username"] as? String,
                       let email = conversation["other_user_email"] as? String,
-                      let id = conversation["conversation_id"] as? String
+                      let id = conversation["conversation_id"] as? String,
+                      let isRead = lastMessageResult["is_read"] as? Bool
                 else {
                     return nil
                 }
                 
-                return ChatItem(id: id, email: email, username: username, lastMessage: text)
+                let lastMessage = ChatItem.LastMessage(message: text, isRead: isRead)
+                
+                return ChatItem(id: id, email: email, username: username, lastMessage: lastMessage)
             }
             
             completion(
@@ -334,6 +337,91 @@ extension DatabaseManager {
             completion(
                 .success(messsageItems)
             )
+        }
+    }
+    
+    /// Send message to existing conversation
+    func sendMessage(
+        to conversationId: String,
+        senderEmail: String,
+        otherUserEmail: String,
+        message: Message,
+        completion: @escaping (Bool) -> Void
+    ) {
+        let path = database.child("\(conversationId)/messages")
+        
+        path.observeSingleEvent(of: .value) { [weak self] snapshot in
+            guard let self = self, var messages = snapshot.value as? [[String: Any]] else {
+                completion(false)
+                return
+            }
+            
+            let date = ChatViewController.formatter.string(from: message.sentDate)
+            
+            let messageItem: [String: Any] = [
+                "id": message.messageId,
+                "type": "text",
+                "message": message.kind.messageText,
+                "date": date,
+                "sender_email": senderEmail,
+                "is_read": false
+            ]
+            
+            messages.append(messageItem)
+            
+            path.setValue(messages) { error, _ in
+                guard error == nil else {
+                    completion(false)
+                    return
+                }
+                
+                self.updateLatestMessageForConversation(
+                    conversationId: conversationId,
+                    userEmail: senderEmail,
+                    newMessage: message
+                ) 
+                
+                self.updateLatestMessageForConversation(
+                    conversationId: conversationId,
+                    userEmail: otherUserEmail,
+                    newMessage: message
+                )
+            }
+        }
+    }
+    
+    func updateLatestMessageForConversation(
+        conversationId: String,
+        userEmail: String,
+        newMessage: Message
+    ) {
+        let path = database.child(userEmail)
+        
+        path.observeSingleEvent(of: .value) { snapshot in
+            guard let user = snapshot.value as? [String: Any],
+                  var conversations = user["conversations"] as? [[String: Any]]
+            else {
+                return
+            }
+            
+            let newMessage: [String: Any] = [
+                "date": ChatViewController.formatter.string(from: newMessage.sentDate),
+                "message": newMessage.kind.messageText,
+                "is_read": false
+            ]
+            
+            let index = conversations.firstIndex { conversation in
+                guard let id = conversation["conversation_id"] as? String else { return false }
+                return id == conversationId
+            }
+            
+            guard let conversationIndex = index else {
+                return
+            }
+            
+            conversations[conversationIndex]["latest_message"] = newMessage
+            
+            path.child("conversations").setValue(conversations)
         }
     }
 }

@@ -124,7 +124,8 @@ extension ChatsListViewController: UITableViewDataSource {
         cell.configure(
             email: conversation.email,
             username: conversation.username,
-            message: conversation.lastMessage
+            message: conversation.lastMessage.message,
+            isRead: conversation.lastMessage.isRead
         )
         cell.selectionStyle = .none
         

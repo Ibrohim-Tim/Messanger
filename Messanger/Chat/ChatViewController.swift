@@ -23,7 +23,7 @@ final class ChatViewController: MessagesViewController {
     
     private var sender: Sender? {
         guard let email = ProfileUserDefaults.email,
-                let username = ProfileUserDefaults.username
+              let username = ProfileUserDefaults.username
         else {
             return nil
         }
@@ -56,7 +56,7 @@ final class ChatViewController: MessagesViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        messagesCollectionView.dataSource = self
+        messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesDisplayDelegate = self
         messagesCollectionView.messagesLayoutDelegate = self
         
@@ -102,7 +102,22 @@ private extension ChatViewController {
         }
     }
     
-    func sendMessage(to conversationId: String) {}
+    func sendMessageToExistingConversation(message: Message) {
+        guard let conversationId = conversationId,
+              let currentUserEmail = ProfileUserDefaults.email?.safe
+        else {
+            return
+        }
+        
+        DatabaseManager.shared.sendMessage(
+            to: conversationId,
+            senderEmail: currentUserEmail,
+            otherUserEmail: otherUserEmail.safe,
+            message: message 
+        ) { success in
+            
+        }
+    }
     
     func createMessageId() -> String? {
         guard let currentUserEmail = ProfileUserDefaults.email?.safe else { return nil }
@@ -110,13 +125,14 @@ private extension ChatViewController {
         let date = Date()
         let dateString = Self.formatter.string(from: date)
         
-        let id = "\(currentUserEmail)_\(otherUserEmail.safe)_\(date)"
+        let id = "\(currentUserEmail)_\(otherUserEmail.safe)_\(dateString)"
         
         return id
     }
 }
 
 extension ChatViewController: MessagesDataSource {
+    
     var currentSender: MessageKit.SenderType {
         guard let sender = sender else {
             fatalError("Current user is nil")
@@ -126,7 +142,7 @@ extension ChatViewController: MessagesDataSource {
     }
     
     func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessageKit.MessagesCollectionView) -> MessageKit.MessageType {
-        messages[indexPath.item]
+        messages[indexPath.section]
     }
     
     func numberOfSections(in messagesCollectionView: MessageKit.MessagesCollectionView) -> Int {
@@ -155,8 +171,10 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
            createConversation(otherUserEmail: otherUserEmail, message: message)
         } else {
             // добавление существующего чата
-            sendMessage(to: "")
+            sendMessageToExistingConversation(message: message)
         }
+        
+        inputBar.inputTextView.text = nil
     }
 }
 
