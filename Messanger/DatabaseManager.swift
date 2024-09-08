@@ -154,7 +154,7 @@ extension DatabaseManager {
             "username": username,
             "latest_message": [
                 "date": date,
-                "message": message.kind.messageText,
+                "content": message.kind.content,
                 "is_read": false
             ] as [String : Any]
         ]
@@ -177,6 +177,8 @@ extension DatabaseManager {
                 let conversations = [conversation]
                 user["conversations"] = conversations
                 reference.setValue(user)
+                
+                // абдула перемести эту часть за скобки но от этого портится логика
                 
                 self?.finishConversationCreating(
                     conversationId: conversationId,
@@ -207,7 +209,7 @@ extension DatabaseManager {
             "username": username,
             "latest_message": [
                 "date": date,
-                "message": message.kind.messageText,
+                "content": message.kind.content,
                 "is_read": false
             ] as [String : Any]
         ]
@@ -226,7 +228,7 @@ extension DatabaseManager {
                 user["conversations"] = conversations
                 reference.setValue(user)
             } else {
-                // масства нет
+                // массива нет
                 user["conversations"] = [otherUserConversation]
                 reference.setValue(user)
             }
@@ -244,8 +246,8 @@ extension DatabaseManager {
     ) {
         let message: [String: Any] = [
             "id": message.messageId,
-            "type": "text",
-            "message": message.kind.messageText,
+            "type": message.kind.type,
+            "content": message.kind.content,
             "date": date,
             "sender_email": currentUserEmail,
             "is_read": false
@@ -279,7 +281,7 @@ extension DatabaseManager {
             
             let resultConversations: [ChatItem] = conversations.compactMap { conversation in
                 guard let lastMessageResult = conversation["latest_message"] as? [String: Any],
-                      let text = lastMessageResult["message"] as? String,
+                      let text = lastMessageResult["content"] as? String,
                       let username = conversation["username"] as? String,
                       let email = conversation["other_user_email"] as? String,
                       let id = conversation["conversation_id"] as? String,
@@ -315,7 +317,7 @@ extension DatabaseManager {
             }
             
             let messsageItems: [Message] = messages.compactMap { message in
-                guard let text = message["message"] as? String,
+                guard let text = message["content"] as? String,
                       let senderEmail = message["sender_email"] as? String,
                       let messageId = message["id"] as? String,
                       let dateString = message["date"] as? String,
@@ -360,8 +362,8 @@ extension DatabaseManager {
             
             let messageItem: [String: Any] = [
                 "id": message.messageId,
-                "type": "text",
-                "message": message.kind.messageText,
+                "type": message.kind.type,
+                "content": message.kind.content,
                 "date": date,
                 "sender_email": senderEmail,
                 "is_read": false
@@ -406,7 +408,7 @@ extension DatabaseManager {
             
             let newMessage: [String: Any] = [
                 "date": ChatViewController.formatter.string(from: newMessage.sentDate),
-                "message": newMessage.kind.messageText,
+                "content": newMessage.kind.content,
                 "is_read": false
             ]
             
@@ -422,6 +424,45 @@ extension DatabaseManager {
             conversations[conversationIndex]["latest_message"] = newMessage
             
             path.child("conversations").setValue(conversations)
+        }
+    }
+    
+    func handleRemoveConversation(
+        currentUserEmail: String,
+        otherUserEmail: String,
+        conversationId: String,
+        completion: @escaping (Bool) -> Void
+    ) {
+        removeConversation(email: currentUserEmail, id: conversationId) { isSuccess in
+            completion(isSuccess)
+        }
+        removeConversation(email: otherUserEmail, id: conversationId) { isSuccess in
+            
+        }
+    }
+    
+    private func removeConversation(email: String, id: String, completion: @escaping (Bool) -> Void) {
+        let reference = database.child("\(email)/conversations")
+        
+        reference.observeSingleEvent(of: .value) { [weak self] snapshot in
+            guard var conversations = snapshot.value as? [[String: Any]] else {
+                completion(false)
+                return
+            }
+            
+            conversations.removeAll { conversation in
+                guard let conversationId = conversation["conversation_id"] as? String else {
+                    return false
+                }
+                
+                return conversationId == id
+            }
+            
+            reference.setValue(conversations)
+            
+            self?.database.child(id).removeValue()
+            
+            completion(true)
         }
     }
 }

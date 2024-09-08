@@ -19,8 +19,9 @@
 		CF2C6C302B2EE9070025EF10 /* ProfileUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C2F2B2EE9070025EF10 /* ProfileUserDefaults.swift */; };
 		CF2C6C322B3DBE0C0025EF10 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C312B3DBE0C0025EF10 /* Message.swift */; };
 		CF2C6C342B3DC0080025EF10 /* Sender.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C332B3DC0080025EF10 /* Sender.swift */; };
-		CF2C6C382B4458280025EF10 /* MessageKind+Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C6C372B4458280025EF10 /* MessageKind+Text.swift */; };
+		CF3764C42BEF855400BD4A9A /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF3764C32BEF855400BD4A9A /* Media.swift */; };
 		CF6FDF442B4FF84500188240 /* UserAvatarProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF6FDF432B4FF84500188240 /* UserAvatarProvider.swift */; };
+		CFA176E62C8DD3E60047A948 /* MessageKind+Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA176E52C8DD3E60047A948 /* MessageKind+Content.swift */; };
 		CFD03BF82B15D51E008E7E0A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD03BF72B15D51E008E7E0A /* AppDelegate.swift */; };
 		CFD03BFA2B15D51E008E7E0A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD03BF92B15D51E008E7E0A /* SceneDelegate.swift */; };
 		CFD03C012B15D520008E7E0A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CFD03C002B15D520008E7E0A /* Assets.xcassets */; };
@@ -63,8 +64,9 @@
 		CF2C6C2F2B2EE9070025EF10 /* ProfileUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileUserDefaults.swift; sourceTree = "<group>"; };
 		CF2C6C312B3DBE0C0025EF10 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		CF2C6C332B3DC0080025EF10 /* Sender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sender.swift; sourceTree = "<group>"; };
-		CF2C6C372B4458280025EF10 /* MessageKind+Text.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MessageKind+Text.swift"; sourceTree = "<group>"; };
+		CF3764C32BEF855400BD4A9A /* Media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		CF6FDF432B4FF84500188240 /* UserAvatarProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAvatarProvider.swift; sourceTree = "<group>"; };
+		CFA176E52C8DD3E60047A948 /* MessageKind+Content.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MessageKind+Content.swift"; sourceTree = "<group>"; };
 		CFD03BF42B15D51E008E7E0A /* Messanger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messanger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFD03BF72B15D51E008E7E0A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CFD03BF92B15D51E008E7E0A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 				CF2C6C282B28A9780025EF10 /* ChatUser.swift */,
 				CF2C6C312B3DBE0C0025EF10 /* Message.swift */,
 				CF2C6C332B3DC0080025EF10 /* Sender.swift */,
+				CF3764C32BEF855400BD4A9A /* Media.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -125,7 +128,7 @@
 			children = (
 				CF2C6C1A2B1F53780025EF10 /* String+Safe.swift */,
 				CF2C6C1C2B1F541A0025EF10 /* NSLayoutConstraint+Activate.swift */,
-				CF2C6C372B4458280025EF10 /* MessageKind+Text.swift */,
+				CFA176E52C8DD3E60047A948 /* MessageKind+Content.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -320,8 +323,9 @@
 				CFD03C152B15DFED008E7E0A /* LoginViewController.swift in Sources */,
 				CF2C6C1D2B1F541A0025EF10 /* NSLayoutConstraint+Activate.swift in Sources */,
 				CF6FDF442B4FF84500188240 /* UserAvatarProvider.swift in Sources */,
+				CFA176E62C8DD3E60047A948 /* MessageKind+Content.swift in Sources */,
 				CFD03C3C2B1BD0E8008E7E0A /* ChatViewController.swift in Sources */,
-				CF2C6C382B4458280025EF10 /* MessageKind+Text.swift in Sources */,
+				CF3764C42BEF855400BD4A9A /* Media.swift in Sources */,
 				CF2C6C292B28A9780025EF10 /* ChatUser.swift in Sources */,
 				CFD03C1E2B15FC78008E7E0A /* RegisterViewController.swift in Sources */,
 				CFD03C1B2B15EA58008E7E0A /* Colors.swift in Sources */,

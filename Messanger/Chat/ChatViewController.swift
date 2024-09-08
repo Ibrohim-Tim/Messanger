@@ -65,7 +65,10 @@ final class ChatViewController: MessagesViewController {
         view.backgroundColor = .white
         
         listenMessagesInConversation()
+        setupInputButton()
     }
+    
+    // MARK: - Private methods
     
     private func listenMessagesInConversation() {
         guard let conversationId = conversationId else { return }
@@ -81,6 +84,78 @@ final class ChatViewController: MessagesViewController {
             }
         }
     }
+    
+    private func setupInputButton() {
+        let button = InputBarButtonItem()
+        button.setSize(
+            CGSize(width: LayoutMetrics.halfModule * 9, height: LayoutMetrics.halfModule * 9),
+            animated: false
+        )
+        button.setImage(
+            UIImage(systemName: "plus"),
+            for: .normal
+        )
+        button.tintColor = .black
+        button.onTouchUpInside { [weak self] _ in
+            self?.handleInputButtonTapped()
+        }
+        
+        messageInputBar.setLeftStackViewWidthConstant(to: LayoutMetrics.halfModule * 9, animated: false)
+        messageInputBar.setStackViewItems([button], forStack: .left, animated: false)
+    }
+    
+}
+
+//MARK: - ImagePicker
+
+extension ChatViewController {
+    
+    private func handleInputButtonTapped() {
+        let alertController = UIAlertController(
+            title: nil,
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+        
+        let cameraAction = UIAlertAction(title: "Камера", style: .default) { [weak self] _ in
+            self?.showCameraPicker()
+        }
+        let photoAction = UIAlertAction(title: "Фото", style: .default) { [weak self] _ in
+            self?.showGalleryPicker()
+        }
+        let videoAction = UIAlertAction(title: "Видео", style: .default) { [weak self] _ in
+        }
+        let geoAction = UIAlertAction(title: "Местоположение", style: .default) { [weak self] _ in
+        }
+        let cancelAction = UIAlertAction(title: "Отменить", style: .cancel) { [weak self] _ in
+        }
+        
+        alertController.addAction(cameraAction)
+        alertController.addAction(photoAction)
+        alertController.addAction(videoAction)
+        alertController.addAction(geoAction)
+        alertController.addAction(cancelAction)
+        
+        present(alertController, animated: true)
+    }
+    
+    private func showCameraPicker() {
+        let viewController = UIImagePickerController()
+        viewController.delegate = self
+        viewController.sourceType = .camera
+        viewController.allowsEditing = true
+        
+        present(viewController, animated: true)
+    }
+    
+    private func showGalleryPicker() {
+        let viewController = UIImagePickerController()
+        viewController.delegate = self
+        viewController.sourceType = .photoLibrary
+        viewController.allowsEditing = true
+        
+        present(viewController, animated: true)
+    }
 }
 
 // MARK: - Messages
@@ -92,13 +167,13 @@ private extension ChatViewController {
             otherUserEmail: otherUserEmail,
             otherUsername: title,
             message: message
-        ) { [weak self] sucess in
-            if sucess {
-                print("create")
-                self?.isNewConversation = false
-            } else {
-                print("non create")
+        ) { [weak self] isSucess in
+            guard isSucess else {
+                print("Can not send message")
+                return
             }
+            
+            self?.isNewConversation = false
         }
     }
     
@@ -114,8 +189,11 @@ private extension ChatViewController {
             senderEmail: currentUserEmail,
             otherUserEmail: otherUserEmail.safe,
             message: message 
-        ) { success in
-            
+        ) { isSucess in
+            guard isSucess else {
+                print("Can not send message")
+                return
+            }
         }
     }
     
@@ -141,12 +219,24 @@ extension ChatViewController: MessagesDataSource {
         return sender
     }
     
-    func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessageKit.MessagesCollectionView) -> MessageKit.MessageType {
+    func messageForItem(
+        at indexPath: IndexPath,
+        in messagesCollectionView: MessageKit.MessagesCollectionView
+    ) -> MessageKit.MessageType {
         messages[indexPath.section]
     }
     
     func numberOfSections(in messagesCollectionView: MessageKit.MessagesCollectionView) -> Int {
         messages.count
+    }
+    
+    func configureMediaMessageImageView(
+        _ imageView: UIImageView,
+        for message: any MessageType,
+        at indexPath: IndexPath,
+        in messagesCollectionView: MessagesCollectionView
+    ) {
+        imageView.image = UIImage(systemName: "plus")
     }
 }
 
@@ -185,3 +275,63 @@ extension ChatViewController: MessagesDisplayDelegate {}
 //MARK: - MessagesLayoutDelegate
 
 extension ChatViewController: MessagesLayoutDelegate {}
+
+//MARK: - UINavigationControllerDelegate
+
+extension ChatViewController: UINavigationControllerDelegate {}
+
+//MARK: - UIImagePickerControllerDelegate
+
+extension ChatViewController: UIImagePickerControllerDelegate {
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
+    }
+    
+    func imagePickerController(
+        _ picker: UIImagePickerController,
+        didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]
+    ) {
+        picker.dismiss(animated: true)
+        
+        guard let image = info[.editedImage] as? UIImage,
+              let data = image.pngData(),
+              let messageId = createMessageId(),
+              let sender = sender
+        else {
+            return
+        }
+        
+        let filename = "message_image_\(messageId).png"
+        
+        StorageManager.shared.uploadMessageImage(data: data, filename: filename) { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let url):
+                let media = Media(
+                    url: url,
+                    image: nil,
+                    placeholderImage: UIImage(systemName: "plus")!,
+                    size: CGSize(width: 300, height: 300)
+                )
+                let message = Message(
+                    sender: sender,
+                    messageId: messageId,
+                    sentDate: Date(),
+                    kind: .photo(media)
+                )
+                
+                if self.isNewConversation {
+                    self.createConversation(otherUserEmail: otherUserEmail, message: message)
+                } else {
+                    // добавление существующего чата
+                    self.sendMessageToExistingConversation(message: message)
+                }
+                
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+}

@@ -64,6 +64,7 @@ final class MainTabBarController: UITabBarController {
     private func showLoginScreen() {
         let viewController = LoginViewController()
         viewController.modalPresentationStyle = .fullScreen
+        
         present(viewController, animated: true)
     }
     

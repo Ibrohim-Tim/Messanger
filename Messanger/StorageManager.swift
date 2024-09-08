@@ -26,13 +26,38 @@ extension StorageManager {
         case downloadUrlError
     }
     
-    func upload(data: Data, filename: String, completion: @escaping (Result<String, Error>) -> Void) {
+    func uploadAvatarImage(data: Data, filename: String, completion: @escaping (Result<String, Error>) -> Void) {
         storage.child("images/\(filename)").putData(data) { data, error in
             guard let _ = data, error == nil else {
                 completion(
                     .failure(StorageManagerError.uploadPictureError)
                 )
                 return
+            }
+        }
+    }
+    
+    func uploadMessageImage(data: Data, filename: String, completion: @escaping (Result<URL, Error>) -> Void) {
+        let reference = storage.child("message_images/\(filename)")
+        reference.putData(data) { data, error in
+            guard let _ = data, error == nil else {
+                completion(
+                    .failure(StorageManagerError.uploadPictureError)
+                )
+                return
+            }
+            
+            reference.downloadURL { url, error in
+                guard let url = url, error == nil else {
+                    completion(
+                        .failure(StorageManagerError.downloadUrlError)
+                    )
+                    return
+                }
+                
+                completion(
+                    .success(url)
+                )
             }
         }
     }

@@ -117,7 +117,7 @@ extension RegisterViewController {
             return
         }
         
-        StorageManager.shared.upload(data: data, filename: user.pictureFilename) { result in
+        StorageManager.shared.uploadAvatarImage(data: data, filename: user.pictureFilename) { result in
             switch result {
             case .success:
                 ProfileUserDefaults.handleAvatarData(data)

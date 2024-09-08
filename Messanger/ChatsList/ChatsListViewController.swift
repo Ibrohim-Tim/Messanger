@@ -102,6 +102,28 @@ final class ChatsListViewController: UIViewController {
         viewController.title = username
         navigationController?.pushViewController(viewController, animated: true)
     }
+    
+    private func handleRemoveConversationAction(indexPath: IndexPath) {
+        guard let email = ProfileUserDefaults.email?.safe else { return }
+        
+        let chat = chats[indexPath.row]
+        let id = chat.id
+        let otherUserEmail = chat.email.safe
+        
+        DatabaseManager.shared.handleRemoveConversation(
+            currentUserEmail: email,
+            otherUserEmail: otherUserEmail,
+            conversationId: id
+        ) { [weak self] isSuccess in
+            guard let self = self, isSuccess else {
+                print("Can not remove comversation")
+                return
+            }
+            
+            self.chats.remove(at: indexPath.row)
+            self.tabelView.deleteRows(at: [indexPath], with: .fade)
+        }
+    }
 }
 
 // MARK: - UITableViewDataSource
@@ -136,6 +158,7 @@ extension ChatsListViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 
 extension ChatsListViewController: UITableViewDelegate {
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = chats[indexPath.row]
         showChatViewController(
@@ -143,5 +166,15 @@ extension ChatsListViewController: UITableViewDelegate {
             username: item.username,
             email: item.email
         )
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "Удалить") { [weak self] _, _, _ in
+            self?.handleRemoveConversationAction(indexPath: indexPath)
+        }
+        return UISwipeActionsConfiguration(actions: [deleteAction])
     }
 }
