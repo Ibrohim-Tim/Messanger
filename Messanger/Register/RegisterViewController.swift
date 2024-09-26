@@ -113,16 +113,16 @@ extension RegisterViewController {
         guard let profilePicture = self.mainView.profilePicture,
               let data = profilePicture.pngData()
         else {
-            ProfileUserDefaults.handleAvatarData(nil)
+            ProfileUserDefaults.handleAvatarUrl(nil)
             return
         }
         
         StorageManager.shared.uploadAvatarImage(data: data, filename: user.pictureFilename) { result in
             switch result {
-            case .success:
-                ProfileUserDefaults.handleAvatarData(data)
+            case .success(let url):
+                ProfileUserDefaults.handleAvatarUrl(url)
             case .failure(let error):
-                ProfileUserDefaults.handleAvatarData(nil)
+                ProfileUserDefaults.handleAvatarUrl(nil)
                 print(error)
             }
         }

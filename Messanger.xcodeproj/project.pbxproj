@@ -22,6 +22,11 @@
 		CF3764C42BEF855400BD4A9A /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF3764C32BEF855400BD4A9A /* Media.swift */; };
 		CF6FDF442B4FF84500188240 /* UserAvatarProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF6FDF432B4FF84500188240 /* UserAvatarProvider.swift */; };
 		CFA176E62C8DD3E60047A948 /* MessageKind+Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA176E52C8DD3E60047A948 /* MessageKind+Content.swift */; };
+		CFA176E92C8F47F90047A948 /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA176E82C8F47F90047A948 /* PhotoViewController.swift */; };
+		CFA176EC2CA323330047A948 /* LocationPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA176EB2CA323330047A948 /* LocationPickerViewController.swift */; };
+		CFA176EE2CA35DDD0047A948 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA176ED2CA35DDD0047A948 /* Location.swift */; };
+		CFA176F12CA48E870047A948 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = CFA176F02CA48E870047A948 /* SDWebImage */; };
+		CFA176F32CA48E870047A948 /* SDWebImageMapKit in Frameworks */ = {isa = PBXBuildFile; productRef = CFA176F22CA48E870047A948 /* SDWebImageMapKit */; };
 		CFD03BF82B15D51E008E7E0A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD03BF72B15D51E008E7E0A /* AppDelegate.swift */; };
 		CFD03BFA2B15D51E008E7E0A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD03BF92B15D51E008E7E0A /* SceneDelegate.swift */; };
 		CFD03C012B15D520008E7E0A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CFD03C002B15D520008E7E0A /* Assets.xcassets */; };
@@ -67,6 +72,9 @@
 		CF3764C32BEF855400BD4A9A /* Media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		CF6FDF432B4FF84500188240 /* UserAvatarProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAvatarProvider.swift; sourceTree = "<group>"; };
 		CFA176E52C8DD3E60047A948 /* MessageKind+Content.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MessageKind+Content.swift"; sourceTree = "<group>"; };
+		CFA176E82C8F47F90047A948 /* PhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
+		CFA176EB2CA323330047A948 /* LocationPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPickerViewController.swift; sourceTree = "<group>"; };
+		CFA176ED2CA35DDD0047A948 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		CFD03BF42B15D51E008E7E0A /* Messanger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messanger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFD03BF72B15D51E008E7E0A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CFD03BF92B15D51E008E7E0A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -103,6 +111,8 @@
 				CFD03C312B18A19F008E7E0A /* FirebaseFirestore in Frameworks */,
 				CFD03C352B18A19F008E7E0A /* FirebaseStorage in Frameworks */,
 				CFD03C2B2B18A19F008E7E0A /* FirebaseAuth in Frameworks */,
+				CFA176F32CA48E870047A948 /* SDWebImageMapKit in Frameworks */,
+				CFA176F12CA48E870047A948 /* SDWebImage in Frameworks */,
 				CFD03C332B18A19F008E7E0A /* FirebaseFirestoreSwift in Frameworks */,
 				CF2C6C2E2B2EDBC30025EF10 /* MessageKit in Frameworks */,
 			);
@@ -119,6 +129,7 @@
 				CF2C6C312B3DBE0C0025EF10 /* Message.swift */,
 				CF2C6C332B3DC0080025EF10 /* Sender.swift */,
 				CF3764C32BEF855400BD4A9A /* Media.swift */,
+				CFA176ED2CA35DDD0047A948 /* Location.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -142,6 +153,22 @@
 			path = NewConversation;
 			sourceTree = "<group>";
 		};
+		CFA176E72C8F2B290047A948 /* Viewers */ = {
+			isa = PBXGroup;
+			children = (
+				CFA176E82C8F47F90047A948 /* PhotoViewController.swift */,
+			);
+			path = Viewers;
+			sourceTree = "<group>";
+		};
+		CFA176EA2CA322F80047A948 /* Location */ = {
+			isa = PBXGroup;
+			children = (
+				CFA176EB2CA323330047A948 /* LocationPickerViewController.swift */,
+			);
+			path = Location;
+			sourceTree = "<group>";
+		};
 		CFD03BEB2B15D51E008E7E0A = {
 			isa = PBXGroup;
 			children = (
@@ -161,6 +188,8 @@
 		CFD03BF62B15D51E008E7E0A /* Messanger */ = {
 			isa = PBXGroup;
 			children = (
+				CFA176EA2CA322F80047A948 /* Location */,
+				CFA176E72C8F2B290047A948 /* Viewers */,
 				CF2C6C252B289E990025EF10 /* NewConversation */,
 				CF2C6C172B1F36F70025EF10 /* Models */,
 				CFD03C3A2B1BD0AD008E7E0A /* Chat */,
@@ -259,6 +288,8 @@
 				CFD03C322B18A19F008E7E0A /* FirebaseFirestoreSwift */,
 				CFD03C342B18A19F008E7E0A /* FirebaseStorage */,
 				CF2C6C2D2B2EDBC30025EF10 /* MessageKit */,
+				CFA176F02CA48E870047A948 /* SDWebImage */,
+				CFA176F22CA48E870047A948 /* SDWebImageMapKit */,
 			);
 			productName = Messanger;
 			productReference = CFD03BF42B15D51E008E7E0A /* Messanger.app */;
@@ -291,6 +322,7 @@
 			packageReferences = (
 				CFD03C272B18A19E008E7E0A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				CF2C6C2C2B2EDBC30025EF10 /* XCRemoteSwiftPackageReference "MessageKit" */,
+				CFA176EF2CA48E870047A948 /* XCRemoteSwiftPackageReference "SDWebImage" */,
 			);
 			productRefGroup = CFD03BF52B15D51E008E7E0A /* Products */;
 			projectDirPath = "";
@@ -322,6 +354,7 @@
 				CFD03C202B160290008E7E0A /* RegisterView.swift in Sources */,
 				CFD03C152B15DFED008E7E0A /* LoginViewController.swift in Sources */,
 				CF2C6C1D2B1F541A0025EF10 /* NSLayoutConstraint+Activate.swift in Sources */,
+				CFA176EC2CA323330047A948 /* LocationPickerViewController.swift in Sources */,
 				CF6FDF442B4FF84500188240 /* UserAvatarProvider.swift in Sources */,
 				CFA176E62C8DD3E60047A948 /* MessageKind+Content.swift in Sources */,
 				CFD03C3C2B1BD0E8008E7E0A /* ChatViewController.swift in Sources */,
@@ -345,12 +378,14 @@
 				CF2C6C162B1F348C0025EF10 /* DatabaseManager.swift in Sources */,
 				CF2C6C2B2B29CA9D0025EF10 /* NewConversationTableViewCell.swift in Sources */,
 				CF2C6C302B2EE9070025EF10 /* ProfileUserDefaults.swift in Sources */,
+				CFA176EE2CA35DDD0047A948 /* Location.swift in Sources */,
 				CF2C6C272B289EEC0025EF10 /* NewConversationViewController.swift in Sources */,
 				CFD03C0D2B15D8DB008E7E0A /* ChatsListViewController.swift in Sources */,
 				CFD03C122B15DC9A008E7E0A /* MainTabBarController.swift in Sources */,
 				CFD03C102B15DC2E008E7E0A /* ProfileViewController.swift in Sources */,
 				CFD03BFA2B15D51E008E7E0A /* SceneDelegate.swift in Sources */,
 				CF2C6C222B1F693E0025EF10 /* StorageManager.swift in Sources */,
+				CFA176E92C8F47F90047A948 /* PhotoViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -574,6 +609,14 @@
 				minimumVersion = 4.0.0;
 			};
 		};
+		CFA176EF2CA48E870047A948 /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImage.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.19.7;
+			};
+		};
 		CFD03C272B18A19E008E7E0A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -589,6 +632,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CF2C6C2C2B2EDBC30025EF10 /* XCRemoteSwiftPackageReference "MessageKit" */;
 			productName = MessageKit;
+		};
+		CFA176F02CA48E870047A948 /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CFA176EF2CA48E870047A948 /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
+		};
+		CFA176F22CA48E870047A948 /* SDWebImageMapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CFA176EF2CA48E870047A948 /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImageMapKit;
 		};
 		CFD03C282B18A19F008E7E0A /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;

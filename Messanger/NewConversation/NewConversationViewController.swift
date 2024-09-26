@@ -163,8 +163,13 @@ extension NewConversationViewController: UISearchBarDelegate {
     }
     
     private func displayUsers(users: [ChatUser], searchText: String) {
-        items = users.filter {
-            $0.username.lowercased().hasPrefix(searchText.lowercased())
+        items = users.filter { user in
+            guard let currentUserEmail = ProfileUserDefaults.email, 
+                    currentUserEmail != user.email
+            else {
+                return false
+            }
+            return user.username.lowercased().hasPrefix(searchText.lowercased())
         }
        
         tableView.reloadData()

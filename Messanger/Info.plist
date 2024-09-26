@@ -6,6 +6,10 @@
 	<string>Разрешить доступ к галерее</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Разрешить приложению использовать камеру</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Разрешить приложению использовать микрофон</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Разрешить доступ к геолокации</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

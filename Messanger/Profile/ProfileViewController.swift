@@ -46,12 +46,7 @@ final class ProfileViewController: UIViewController {
         
         emailLabel.text = ProfileUserDefaults.email
         usernameLabel.text = ProfileUserDefaults.username
-        
-        if let avatarData = ProfileUserDefaults.avatsrData {
-            profileImageView.image = UIImage(data: avatarData)
-        } else if let avatarUrl = ProfileUserDefaults.avatsrUrl {
-           fetchAvatar(url: avatarUrl)
-        }
+        profileImageView.sd_setImage(with: ProfileUserDefaults.avatarUrl)
     }
     
     // MARK: - Private methods
@@ -88,31 +83,6 @@ final class ProfileViewController: UIViewController {
         let viewController = LoginViewController()
         viewController.modalPresentationStyle = .fullScreen
         present(viewController, animated: true)
-    }
-    
-    private func fetchAvatar(url: String) {
-        guard let url = URL(string: url) else {
-            return
-        }
-        
-        let request = URLRequest(url: url)
-        
-        URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
-            guard let data = data, error == nil else {
-                print("Can not fetch avatar")
-                return
-            }
-            
-            guard let avatar = UIImage(data: data) else {
-                return
-            }
-            
-            DispatchQueue.main.async {
-                self?.profileImageView.image = avatar
-            }
-            
-            ProfileUserDefaults.handleAvatarData(data)
-        }.resume()
     }
 }
 

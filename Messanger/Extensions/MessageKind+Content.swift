@@ -13,8 +13,10 @@ extension MessageKind {
         switch self {
         case .text(let string):
             return string
-        case .photo(let item):
+        case .photo(let item), .video(let item):
             return item.url?.absoluteString ?? ""
+        case .location(let item):
+            return "\(item.location.coordinate.latitude),\(item.location.coordinate.longitude)"
         default:
             return ""
         }
@@ -26,8 +28,12 @@ extension MessageKind {
             return "text"
         case .photo:
             return "photo"
+        case .video:
+            return "video"
+        case .location:
+            return "location"
         default:
-            fatalError("Can be text or photo only")
+            fatalError("Unknown message type")
         }
     }
 }

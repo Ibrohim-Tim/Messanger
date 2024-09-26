@@ -12,6 +12,8 @@ struct ChatItem {
     struct LastMessage {
         let message: String
         let isRead: Bool
+        let type: String
+        let senderEmail: String
     }
     
     let id: String

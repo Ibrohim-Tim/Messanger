@@ -80,6 +80,7 @@ final class NewConversationTableViewCell: UITableViewCell {
      }
     
     private func configureAvatarImage(email: String) {
+        StorageManager.shared.url(for: email.safe + "-picture.png")
         UserAvatarProvider.shared.avatar(for: email) { [weak self] data in
             guard let data = data else { return }
             

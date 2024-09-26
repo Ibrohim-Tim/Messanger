@@ -10,7 +10,7 @@ import UIKit
 final class ChatsListViewController: UIViewController {
     
     private var chats: [ChatItem] = []
-        
+            
     // MARK: - UI Elements
     
     private let tabelView: UITableView = {
@@ -33,6 +33,13 @@ final class ChatsListViewController: UIViewController {
             barButtonSystemItem: .compose,
             target: self,
             action: #selector(newChatButtonTapped)
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(loginDidFinish),
+            name: Notifications.loginDidFinish,
+            object: nil
         )
         
         setupSearchController()
@@ -85,9 +92,18 @@ final class ChatsListViewController: UIViewController {
     private func newChatButtonTapped() {
         let vc = NewConversationViewController()
         vc.completion = { [weak self] username, email in
-            self?.showChatViewController(conversationId: nil, username: username, email: email)
+            guard let self = self else { return }
+            
+            let conversation = self.chats.first { $0.email == email }
+            
+            self.showChatViewController(conversationId: conversation?.id, username: username, email: email)
         }
         present(vc, animated: true)
+    }
+    
+    @objc
+    private func loginDidFinish() {
+        listenConversations()
     }
     
     private func showChatViewController(
@@ -143,11 +159,23 @@ extension ChatsListViewController: UITableViewDataSource {
         
         let conversation = chats[indexPath.row]
         
+        let message = conversation.lastMessage.type == "text" 
+        ? conversation.lastMessage.message
+        : conversation.lastMessage.type.firstCapitalized
+        
+        let isRead: Bool
+        
+        if conversation.lastMessage.senderEmail == ProfileUserDefaults.email?.safe {
+            isRead = true
+        } else {
+            isRead = conversation.lastMessage.isRead
+        }
+        
         cell.configure(
             email: conversation.email,
             username: conversation.username,
-            message: conversation.lastMessage.message,
-            isRead: conversation.lastMessage.isRead
+            message: message,
+            isRead: isRead
         )
         cell.selectionStyle = .none
         
@@ -166,6 +194,19 @@ extension ChatsListViewController: UITableViewDelegate {
             username: item.username,
             email: item.email
         )
+        
+        guard let currentUserEmail = ProfileUserDefaults.email?.safe else { return }
+        
+        DatabaseManager.shared.markAllMessagesRead(
+            currentUserEmail: currentUserEmail,
+            conversationId: item.id
+        ) { isSuccess in
+            guard isSuccess else {
+                return
+            }
+            
+            print("All messages marked as read")
+        }
     }
     
     func tableView(

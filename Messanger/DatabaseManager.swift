@@ -5,8 +5,10 @@
 //  Created by Ibrahim Timurkaev on 05.12.2023.
 //
 
-import Foundation
+import UIKit
 import FirebaseDatabase
+import MessageKit
+import CoreLocation
 
 final class DatabaseManager {
     
@@ -103,7 +105,7 @@ extension DatabaseManager {
         otherUserEmail: String,
         otherUsername: String?,
         message: Message,
-        completion: @escaping (Bool) -> Void
+        completion: @escaping (String?) -> Void
     ) {
         guard let currentUserEmail = ProfileUserDefaults.email,
               let currentUsername = ProfileUserDefaults.username,
@@ -123,7 +125,9 @@ extension DatabaseManager {
             otherUserEmail: otherUserEmail,
             message: message
         ) { isSuccess in
+            guard isSuccess else { return }
             
+            completion(conversationId)
         }
         
         updateConversationForOtherUser(
@@ -155,7 +159,9 @@ extension DatabaseManager {
             "latest_message": [
                 "date": date,
                 "content": message.kind.content,
-                "is_read": false
+                "type": message.kind.type,
+                "is_read": false,
+                "sender_email": currentUserEmail
             ] as [String : Any]
         ]
         
@@ -210,7 +216,9 @@ extension DatabaseManager {
             "latest_message": [
                 "date": date,
                 "content": message.kind.content,
-                "is_read": false
+                "type": message.kind.type,
+                "is_read": false,
+                "sender_email": currentUserEmail.safe
             ] as [String : Any]
         ]
         
@@ -285,12 +293,20 @@ extension DatabaseManager {
                       let username = conversation["username"] as? String,
                       let email = conversation["other_user_email"] as? String,
                       let id = conversation["conversation_id"] as? String,
-                      let isRead = lastMessageResult["is_read"] as? Bool
+                      let isRead = lastMessageResult["is_read"] as? Bool,
+                      let type = lastMessageResult["type"] as? String,
+                      let senderEmail = lastMessageResult["sender_email"] as? String
                 else {
                     return nil
                 }
                 
-                let lastMessage = ChatItem.LastMessage(message: text, isRead: isRead)
+                
+                let lastMessage = ChatItem.LastMessage(
+                    message: text,
+                    isRead: isRead,
+                    type: type,
+                    senderEmail: senderEmail
+                )
                 
                 return ChatItem(id: id, email: email, username: username, lastMessage: lastMessage)
             }
@@ -317,13 +333,58 @@ extension DatabaseManager {
             }
             
             let messsageItems: [Message] = messages.compactMap { message in
-                guard let text = message["content"] as? String,
+                guard let content = message["content"] as? String,
                       let senderEmail = message["sender_email"] as? String,
                       let messageId = message["id"] as? String,
                       let dateString = message["date"] as? String,
+                      let typeString = message["type"] as? String,
                       let date = ChatViewController.formatter.date(from: dateString)
                 else {
                     return nil
+                }
+                
+                let kind: MessageKind
+                
+                switch typeString {
+                case "text":
+                    kind = .text(content)
+                case "photo":
+                    let media = Media(
+                        url: URL(string: content),
+                        image: nil,
+                        placeholderImage: UIImage(systemName: "plus")!,
+                        size: CGSize(width: 300, height: 300)
+                    )
+                    kind = .photo(media)
+                case "video":
+                    let media = Media(
+                        url: URL(string: content),
+                        image: nil,
+                        placeholderImage: UIImage(systemName: "message")!,
+                        size: CGSize(width: 300, height: 300)
+                    )
+                    kind = .video(media)
+                case "location":
+                    let coordinates = content.components(separatedBy: ",")
+                    
+                    guard coordinates.count == 2,
+                          let latitude = Double(coordinates[0]),
+                          let longitude = Double(coordinates[1])
+                    else {
+                        return nil
+                    }
+                    
+                    let locationItem = CLLocation(
+                        latitude: latitude,
+                        longitude: longitude
+                    )
+                    let location = Location(
+                        location: locationItem,
+                        size: CGSize(width: 150, height: 150)
+                    )
+                    kind = .location(location)
+                default:
+                    fatalError("Unknown message type")
                 }
                 
                 let sender = Sender(senderId: senderEmail, displayName: senderEmail)
@@ -332,7 +393,7 @@ extension DatabaseManager {
                     sender: sender,
                     messageId: messageId,
                     sentDate: date,
-                    kind: .text(text)
+                    kind: kind
                 )
             }
             
@@ -380,13 +441,15 @@ extension DatabaseManager {
                 self.updateLatestMessageForConversation(
                     conversationId: conversationId,
                     userEmail: senderEmail,
-                    newMessage: message
-                ) 
+                    newMessage: message,
+                    senderEmail: senderEmail
+                )
                 
                 self.updateLatestMessageForConversation(
                     conversationId: conversationId,
                     userEmail: otherUserEmail,
-                    newMessage: message
+                    newMessage: message,
+                    senderEmail: senderEmail
                 )
             }
         }
@@ -395,7 +458,8 @@ extension DatabaseManager {
     func updateLatestMessageForConversation(
         conversationId: String,
         userEmail: String,
-        newMessage: Message
+        newMessage: Message,
+        senderEmail: String
     ) {
         let path = database.child(userEmail)
         
@@ -409,7 +473,9 @@ extension DatabaseManager {
             let newMessage: [String: Any] = [
                 "date": ChatViewController.formatter.string(from: newMessage.sentDate),
                 "content": newMessage.kind.content,
-                "is_read": false
+                "type": newMessage.kind.type,
+                "is_read": false,
+                "sender_email": senderEmail
             ]
             
             let index = conversations.firstIndex { conversation in
@@ -463,6 +529,82 @@ extension DatabaseManager {
             self?.database.child(id).removeValue()
             
             completion(true)
+        }
+    }
+}
+
+// MARK: - Read message
+
+extension DatabaseManager {
+    
+    func markAllMessagesRead(
+        currentUserEmail: String,
+        conversationId: String,
+        completion: @escaping (Bool) -> Void
+    ) {
+        let reference = database.child("\(conversationId)/messages")
+        
+        reference.observeSingleEvent(of: .value) { snapshot in
+            guard var messages = snapshot.value as? [[String: Any]] else {
+                completion(false)
+                return
+            }
+            
+            for i in 0..<messages.count {
+                guard let senderEmail = messages[i]["sender_email"] as? String else { continue }
+                
+                if senderEmail != currentUserEmail {
+                    messages[i]["is_read"] = true
+                }
+            }
+            
+            reference.setValue(messages) { [weak self] error, _ in
+                guard error == nil else {
+                    completion(false)
+                    return
+                }
+                
+                self?.markLatestMessageAsRead(userEmail: currentUserEmail, conversationId: conversationId)
+            }
+        }
+    }
+    
+    func markLatestMessageAsRead(
+        userEmail: String,
+        conversationId: String
+    ){
+        let path = database.child("\(userEmail)/conversations")
+        
+        path.observeSingleEvent(of: .value) { snapshot in
+            guard var conversations = snapshot.value as? [[String: Any]] else {
+                return
+            }
+            
+            let indexResult = conversations.firstIndex { conversation in
+                guard let conversationResultId = conversation["conversation_id"] as? String else {
+                    return false
+                }
+                
+                return conversationResultId == conversationId
+            }
+            
+            guard let index = indexResult else { return }
+            
+            let conversation = conversations[index]
+            
+            guard var latestMessage = conversation["latest_message"] as? [String: Any],
+                  let senderEmail = latestMessage["sender_email"] as? String
+            else {
+                return
+            }
+            
+            if senderEmail != userEmail {
+                latestMessage["is_read"] = true
+            }
+            
+            conversations[index]["latest_message"] = latestMessage
+            
+            path.setValue(conversations)
         }
     }
 }

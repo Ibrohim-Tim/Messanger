@@ -8,6 +8,8 @@
 import UIKit
 import MessageKit
 import InputBarAccessoryView
+import CoreLocation
+import SDWebImage
 
 final class ChatViewController: MessagesViewController {
     
@@ -33,7 +35,7 @@ final class ChatViewController: MessagesViewController {
     
     private let otherUserEmail: String
     private var isNewConversation: Bool
-    private let conversationId: String?
+    private var conversationId: String?
 
     //MARK: - Init
     
@@ -59,6 +61,7 @@ final class ChatViewController: MessagesViewController {
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesDisplayDelegate = self
         messagesCollectionView.messagesLayoutDelegate = self
+        messagesCollectionView.messageCellDelegate = self
         
         messageInputBar.delegate = self
         
@@ -75,6 +78,7 @@ final class ChatViewController: MessagesViewController {
         
         DatabaseManager.shared.getAllMessagesForConversation(conversationId: conversationId) { [weak self] result in
             guard let self = self else { return }
+            
             switch result {
             case .success(let messages):
                 self.messages = messages
@@ -124,8 +128,10 @@ extension ChatViewController {
             self?.showGalleryPicker()
         }
         let videoAction = UIAlertAction(title: "Видео", style: .default) { [weak self] _ in
+            self?.showVideoPicker()
         }
         let geoAction = UIAlertAction(title: "Местоположение", style: .default) { [weak self] _ in
+            self?.showLocationPicker(target: .send)
         }
         let cancelAction = UIAlertAction(title: "Отменить", style: .cancel) { [weak self] _ in
         }
@@ -156,24 +162,48 @@ extension ChatViewController {
         
         present(viewController, animated: true)
     }
+    
+    private func showVideoPicker() {
+        let viewController = UIImagePickerController()
+        viewController.delegate = self
+        viewController.sourceType = .photoLibrary
+        viewController.mediaTypes = ["public.movie"]
+        viewController.allowsEditing = true
+        
+        present(viewController, animated: true)
+    }
+    
+    private func showLocationPicker(target: LocationPickerViewController.Target) {
+        let viewController = LocationPickerViewController(target: target)
+        viewController.delegate = self
+        
+        navigationController?.pushViewController(viewController, animated: true)
+    }
 }
 
 // MARK: - Messages
 
 private extension ChatViewController {
     
-    func createConversation(otherUserEmail: String, message: Message) {
+    func createConversation(
+        otherUserEmail: String,
+        message: Message
+    ) {
         DatabaseManager.shared.createConversation(
             otherUserEmail: otherUserEmail,
             otherUsername: title,
             message: message
-        ) { [weak self] isSucess in
-            guard isSucess else {
-                print("Can not send message")
+        ) { [weak self] conversationId in
+            guard let self = self else { return }
+            
+            guard let conversationId = conversationId else {
+                print("Can not create conversation")
                 return
             }
             
-            self?.isNewConversation = false
+            self.conversationId = conversationId
+            self.isNewConversation = false
+            self.listenMessagesInConversation()
         }
     }
     
@@ -229,15 +259,6 @@ extension ChatViewController: MessagesDataSource {
     func numberOfSections(in messagesCollectionView: MessageKit.MessagesCollectionView) -> Int {
         messages.count
     }
-    
-    func configureMediaMessageImageView(
-        _ imageView: UIImageView,
-        for message: any MessageType,
-        at indexPath: IndexPath,
-        in messagesCollectionView: MessagesCollectionView
-    ) {
-        imageView.image = UIImage(systemName: "plus")
-    }
 }
 
 //MARK: - InputBarAccessoryViewDelegate
@@ -270,11 +291,81 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
 
 //MARK: - MessagesDisplayDelegate
 
-extension ChatViewController: MessagesDisplayDelegate {}
+extension ChatViewController: MessagesDisplayDelegate {
+    
+    func configureMediaMessageImageView(
+        _ imageView: UIImageView,
+        for message: any MessageType,
+        at indexPath: IndexPath,
+        in messagesCollectionView: MessagesCollectionView
+    ) {
+        let photoUrlString = message.kind.content
+        
+        let url = URL(string: photoUrlString) // Было очищение от опционала через guard
+        
+        imageView.sd_setImage(with: url)
+        
+//        let urlReqest = URLRequest(url: url)
+        
+//        URLSession.shared.dataTask(with: urlReqest) { data, _, error in
+//            guard let data = data, error == nil else {
+//                print("Can not download message photo")
+//                return
+//            }
+//            
+//            let image = UIImage(data: data)
+//            
+//            DispatchQueue.main.async {
+//                imageView.image = image
+//            }
+//        }.resume()
+    }
+}
 
 //MARK: - MessagesLayoutDelegate
 
 extension ChatViewController: MessagesLayoutDelegate {}
+
+//MARK: - MessageCellDelegate
+
+extension ChatViewController: MessageCellDelegate {
+    
+    func didTapImage(in cell: MessageCollectionViewCell) {
+        guard let indexPath = messagesCollectionView.indexPath(for: cell) else {
+            return
+        }
+        
+        let message = messages[indexPath.section]
+        
+        switch message.kind {
+        case .photo(let item):
+            guard let url = item.url else { return }
+            
+            let vc = PhotoViewController(url: url)
+            
+            navigationController?.pushViewController(vc, animated: true) // сделать другую анимацию открытия картинки в чате
+        default:
+            return
+        }
+    }
+    
+    func didTapMessage(in cell: MessageCollectionViewCell) {
+        guard let indexPath = messagesCollectionView.indexPath(for: cell) else {
+            return
+        }
+        
+        let message = messages[indexPath.section]
+        
+        switch message.kind {
+        case .location(let item):
+            showLocationPicker(
+                target: .show(item.location)
+            )
+        default:
+            return
+        }
+    }
+}
 
 //MARK: - UINavigationControllerDelegate
 
@@ -294,13 +385,17 @@ extension ChatViewController: UIImagePickerControllerDelegate {
     ) {
         picker.dismiss(animated: true)
         
-        guard let image = info[.editedImage] as? UIImage,
-              let data = image.pngData(),
-              let messageId = createMessageId(),
-              let sender = sender
-        else {
-            return
+        guard let messageId = createMessageId(), let sender = sender else { return }
+        
+        if let image = info[.editedImage] as? UIImage {
+            handleImagePickerPhotoSelected(image: image, messageId: messageId, sender: sender)
+        } else if let url = info[.mediaURL] as? URL {
+            handleImagePickerVideoSelected(url: url, messageId: messageId, sender: sender)
         }
+    }
+    
+    private func handleImagePickerPhotoSelected(image: UIImage, messageId: String, sender: Sender) {
+        guard let data = image.pngData() else { return }
         
         let filename = "message_image_\(messageId).png"
         
@@ -332,6 +427,65 @@ extension ChatViewController: UIImagePickerControllerDelegate {
             case .failure(let error):
                 print(error)
             }
+        }
+    }
+    
+    private func handleImagePickerVideoSelected(url: URL, messageId: String, sender: Sender) {
+        let filename = "message_video_\(messageId).mov"
+        
+        StorageManager.shared.uploadMessageVideo(url: url, filename: filename) { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let url):
+                let media = Media(
+                    url: url,
+                    image: nil,
+                    placeholderImage: UIImage(systemName: "message")!,
+                    size: CGSize(width: 300, height: 300)
+                )
+                let message = Message(
+                    sender: sender,
+                    messageId: messageId,
+                    sentDate: Date(),
+                    kind: .video(media)
+                )
+                
+                if self.isNewConversation {
+                    self.createConversation(otherUserEmail: otherUserEmail, message: message)
+                } else {
+                    // добавление существующего чата
+                    self.sendMessageToExistingConversation(message: message)
+                }
+                
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+}
+
+// MARK: - LocationPickerViewControllerDelegate
+
+extension ChatViewController: LocationPickerViewControllerDelegate {
+    
+    func locationDidSelect(location: CLLocation) {
+        guard let sender = sender, let messageId = createMessageId() else { return }
+        
+        let location = Location(location: location, size: .zero)
+        
+        let message = Message(
+            sender: sender,
+            messageId: messageId,
+            sentDate: Date(),
+            kind: .location(location)
+        )
+        
+        if self.isNewConversation {
+            self.createConversation(otherUserEmail: otherUserEmail, message: message)
+        } else {
+            // добавление существующего чата
+            self.sendMessageToExistingConversation(message: message)
         }
     }
 }
