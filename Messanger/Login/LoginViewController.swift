@@ -45,46 +45,7 @@ final class LoginViewController: UIViewController {
     
     @objc
     private func loginButtonTapped() {
-        guard let email = mainView.emailTextField.text,
-              let password = mainView.passwordTextField.text
-        else {
-            return // можно добавить алерт
-        }
-        
-        // Можно сделать проверки после получения данных
-        
-        networkService.login(email: email, password: password) { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let email):
-                DatabaseManager.shared.getUser(email: email) { result in
-                    switch result {
-                    case .success(let user):
-                        ProfileUserDefaults.handleUser(user)
-                        
-                        StorageManager.shared.url(for: user.pictureFilename) { result in
-                            switch result {
-                            case .success(let url):
-                                ProfileUserDefaults.handleAvatarUrl(url)
-                            case .failure(let error):
-                                ProfileUserDefaults.handleAvatarUrl(nil)
-                                print(error)
-                            }
-                        }
-                        
-                        NotificationCenter.default.post(name: Notifications.loginDidFinish, object: nil)
-                        self.dismiss(animated: true)
-                        
-                    case .failure(let error):
-                        print(error)
-                    }
-                }
-                
-            case .failure(let error):
-                print(error)  // можно показать алерт вместо принта
-            }
-        }
+        handleLoginButton()
     }
     
     @objc
@@ -98,5 +59,24 @@ final class LoginViewController: UIViewController {
     @objc
     private func loginDidFinish() {
         dismiss(animated: true)
+    }
+}
+
+extension LoginViewController {
+    
+    private func handleLoginButton() {
+        guard let email = mainView.emailTextField.text,
+              let password = mainView.passwordTextField.text
+        else {
+            return // можно добавить алерт
+        }
+        
+        // Можно сделать проверки после получения данных
+        
+        networkService.login(email: email, password: password) { [weak self] in
+            NotificationCenter.default.post(name: Notifications.loginDidFinish, object: nil)
+            
+            self?.dismiss(animated: true)
+        }
     }
 }

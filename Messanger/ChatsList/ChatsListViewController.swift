@@ -10,6 +10,8 @@ import UIKit
 final class ChatsListViewController: UIViewController {
     
     private var chats: [ChatItem] = []
+    
+    private let databaseManager = ConversationListDatabaseManager()
             
     // MARK: - UI Elements
     
@@ -68,7 +70,9 @@ final class ChatsListViewController: UIViewController {
     private func listenConversations() {
         guard let currentUserEmail = ProfileUserDefaults.email?.safe else { return }
         
-        DatabaseManager.shared.getAllConversations(for: currentUserEmail) { [weak self] result in
+        databaseManager.getAllConversations(
+            for: currentUserEmail
+        ) { [weak self] result in
             switch result {
             case .success(let conversations):
                 self?.chats = conversations
@@ -126,7 +130,7 @@ final class ChatsListViewController: UIViewController {
         let id = chat.id
         let otherUserEmail = chat.email.safe
         
-        DatabaseManager.shared.handleRemoveConversation(
+        databaseManager.handleRemoveConversation(
             currentUserEmail: email,
             otherUserEmail: otherUserEmail,
             conversationId: id
@@ -197,7 +201,7 @@ extension ChatsListViewController: UITableViewDelegate {
         
         guard let currentUserEmail = ProfileUserDefaults.email?.safe else { return }
         
-        DatabaseManager.shared.markAllMessagesRead(
+        databaseManager.markAllMessagesRead(
             currentUserEmail: currentUserEmail,
             conversationId: item.id
         ) { isSuccess in

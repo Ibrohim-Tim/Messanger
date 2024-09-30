@@ -80,55 +80,28 @@ extension RegisterViewController {
             return
         }
         
-        let isUsernameValid = handleUsername(username)
-        let isEmailValid = handleEmail(email)
-        let isPasswordValid = handlePassword(password, confirmation: confirmation)
+        let isUsernameValid = checkUsername(username)
+        let isEmailValid = checkEmail(email)
+        let isPasswordValid = checkPassword(password, confirmation: confirmation)
         
         guard isUsernameValid, isEmailValid, isPasswordValid else { return }
         
         // запуск спинера
         
-        networkService.register(email: email, password: password) { [weak self] result in
-            guard let self = self else { return }
+        networkService.register(
+            email: email,
+            username: username,
+            password: password,
+            avatarData: mainView.profileImageView.image?.pngData()
+        ) { [weak self] in
+            self?.dismiss(animated: true) {
+                NotificationCenter.default.post(name: Notifications.loginDidFinish, object: nil)
+            }
             
-            switch result {
-            case .success(let email):
-                let user = User(username: username, email: email)
-                
-                ProfileUserDefaults.handleUser(user)
-                DatabaseManager.shared.saveUser(user)
-                self.uploadProfilePicture(user: user)
-                
-                self.dismiss(animated: true) {
-                    NotificationCenter.default.post(name: Notifications.loginDidFinish, object: nil)
-                }
-            case .failure(let error):
-                print(error)
-                // можно добавить алерт об ошибке (ок)
-            }
         }
     }
     
-    private func uploadProfilePicture(user: User) {
-        guard let profilePicture = self.mainView.profilePicture,
-              let data = profilePicture.pngData()
-        else {
-            ProfileUserDefaults.handleAvatarUrl(nil)
-            return
-        }
-        
-        StorageManager.shared.uploadAvatarImage(data: data, filename: user.pictureFilename) { result in
-            switch result {
-            case .success(let url):
-                ProfileUserDefaults.handleAvatarUrl(url)
-            case .failure(let error):
-                ProfileUserDefaults.handleAvatarUrl(nil)
-                print(error)
-            }
-        }
-    }
-    
-    private func handleEmail(_ email: String) -> Bool {
+    private func checkEmail(_ email: String) -> Bool {
         guard email.count >= 6,
               email.firstIndex(of: "@") != nil,
               email.firstIndex(of: ".") != nil
@@ -140,7 +113,7 @@ extension RegisterViewController {
         return true
     }
     
-    private func handlePassword(_ password: String, confirmation: String) -> Bool {
+    private func checkPassword(_ password: String, confirmation: String) -> Bool {
         if password.count < 8 {
             showAlert(title: "Ошибка", message: "Доина пароля меньше 8 символов")
             return false
@@ -153,7 +126,7 @@ extension RegisterViewController {
         return true
     }
     
-    private func handleUsername(_ username: String) -> Bool {
+    private func checkUsername(_ username: String) -> Bool {
         guard username.count >= 3 else {
             showAlert(title: "Ошибка", message: "Имя должно быть больше 3 символов")
             return false

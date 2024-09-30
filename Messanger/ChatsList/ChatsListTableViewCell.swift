@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 final class ChatsListTableViewCell: UITableViewCell {
 
@@ -98,11 +99,12 @@ final class ChatsListTableViewCell: UITableViewCell {
     }
     
     private func configureAvatarImage(email: String) {
-        UserAvatarProvider.shared.avatar(for: email) { [weak self] data in
-            guard let data = data else { return }
-            
-            DispatchQueue.main.async {
-                self?.chatImageView.image = UIImage(data: data)
+        StorageManager.shared.url(for: email.safe + "-picture.png") { [weak self] result in
+            switch result {
+            case .success(let url):
+                self?.chatImageView.sd_setImage(with: url)
+            case .failure(let error):
+                print(error)
             }
         }
     }

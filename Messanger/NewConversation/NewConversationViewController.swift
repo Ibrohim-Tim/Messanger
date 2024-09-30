@@ -12,7 +12,10 @@ class NewConversationViewController: UIViewController {
     var completion: ((String, String) -> Void)?
     
     private var fetchedUsers: [ChatUser] = []
-    private var items: [ChatUser] = []
+    
+    private var items: [SearchedUser] = []
+    
+    private let userAvatarUrlProvider = UserAvatarUrlProvider()
     
     // MARK: - UI Elements
     
@@ -75,7 +78,7 @@ class NewConversationViewController: UIViewController {
     }
     
     private func fetchData(completion: @escaping ([ChatUser]) -> Void) {
-        DatabaseManager.shared.getAllUsers { [weak self] result in
+        AccountDatabaseManager.shared.getAllUsers { [weak self] result in
             guard let self = self else { return }
             
             switch result {
@@ -127,7 +130,7 @@ extension NewConversationViewController: UITableViewDataSource {
         
         let user = items[indexPath.row]
         
-        cell.configure(user: user)
+        cell.configure(user: user, avatarUrlProvider: userAvatarUrlProvider)
         cell.selectionStyle = .none
         
         return cell
@@ -163,13 +166,22 @@ extension NewConversationViewController: UISearchBarDelegate {
     }
     
     private func displayUsers(users: [ChatUser], searchText: String) {
-        items = users.filter { user in
-            guard let currentUserEmail = ProfileUserDefaults.email, 
+        let filteredUsers = users.filter { user in
+            guard let currentUserEmail = ProfileUserDefaults.email,
                     currentUserEmail != user.email
             else {
                 return false
             }
             return user.username.lowercased().hasPrefix(searchText.lowercased())
+        }
+        
+        items = filteredUsers.map { user in
+            
+            SearchedUser(
+                email: user.email,
+                username: user.username,
+                avatarUrl: nil
+            )
         }
        
         tableView.reloadData()

@@ -21,8 +21,6 @@ final class ChatViewController: MessagesViewController {
         return formatter
     }()
     
-    private var messages: [Message] = []
-    
     private var sender: Sender? {
         guard let email = ProfileUserDefaults.email,
               let username = ProfileUserDefaults.username
@@ -33,7 +31,10 @@ final class ChatViewController: MessagesViewController {
         return Sender(senderId: email.safe, displayName: username)
     }
     
+    private let databaseManager = ConversationDatabaseManager()
     private let otherUserEmail: String
+    
+    private var messages: [Message] = []
     private var isNewConversation: Bool
     private var conversationId: String?
 
@@ -76,7 +77,9 @@ final class ChatViewController: MessagesViewController {
     private func listenMessagesInConversation() {
         guard let conversationId = conversationId else { return }
         
-        DatabaseManager.shared.getAllMessagesForConversation(conversationId: conversationId) { [weak self] result in
+        databaseManager.getAllMessagesForConversation(
+            conversationId: conversationId
+        ) { [weak self] result in
             guard let self = self else { return }
             
             switch result {
@@ -133,8 +136,7 @@ extension ChatViewController {
         let geoAction = UIAlertAction(title: "Местоположение", style: .default) { [weak self] _ in
             self?.showLocationPicker(target: .send)
         }
-        let cancelAction = UIAlertAction(title: "Отменить", style: .cancel) { [weak self] _ in
-        }
+        let cancelAction = UIAlertAction(title: "Отменить", style: .cancel)
         
         alertController.addAction(cameraAction)
         alertController.addAction(photoAction)
@@ -189,7 +191,7 @@ private extension ChatViewController {
         otherUserEmail: String,
         message: Message
     ) {
-        DatabaseManager.shared.createConversation(
+        databaseManager.createConversation(
             otherUserEmail: otherUserEmail,
             otherUsername: title,
             message: message
@@ -214,7 +216,7 @@ private extension ChatViewController {
             return
         }
         
-        DatabaseManager.shared.sendMessage(
+        databaseManager.sendMessage(
             to: conversationId,
             senderEmail: currentUserEmail,
             otherUserEmail: otherUserEmail.safe,
